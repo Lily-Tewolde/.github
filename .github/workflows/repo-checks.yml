@@ -1,0 +1,36 @@
+# The checks every one of my repos runs. Each repo calls this file from its own
+# .github/workflows/checks.yml, so a fix here reaches all of them.
+name: Repo checks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  repo-checks:
+    name: Repo checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo being checked
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get the shared check script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Lily-Tewolde/.github
+          ref: main
+          path: .repo-checks
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Run the checks
+        run: python3 .repo-checks/checks/repo_checks.py
